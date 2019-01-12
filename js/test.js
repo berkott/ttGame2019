@@ -3,20 +3,20 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: p
 
 function preload() {
 
+    game.load.image('bullet', '../imgs/asteroid.jpg');
+    game.load.image('enemyBullet', 'assets/games/invaders/enemy-bullet.png');
     game.load.spritesheet('invader', 'assets/games/invaders/invader32x32x4.png', 32, 32);
-    game.load.image('rocket', '../imgs/rocket.png');
-    game.load.spritesheet('explosion', 'assets/games/invaders/explode.png', 128, 128);
+    game.load.image('ship', 'assets/games/invaders/player.png');
+    game.load.spritesheet('kaboom', 'assets/games/invaders/explode.png', 128, 128);
     game.load.image('starfield', 'assets/games/invaders/starfield.png');
-    game.load.image('space', '../imgs/spacegif.png');
+    game.load.image('background', 'assets/games/starstruck/background2.png');
 
 }
 
-var rocket;
-
-// var player;
-// var aliens;
-// var bullets;
-// var bulletTime = 0;
+var player;
+var aliens;
+var bullets;
+var bulletTime = 0;
 var cursors;
 var fireButton;
 var explosions;
@@ -24,20 +24,18 @@ var starfield;
 var score = 0;
 var scoreString = '';
 var scoreText;
-// var lives;
-// var enemyBullet;
+var lives;
+var enemyBullet;
 var firingTimer = 0;
 var stateText;
-// var livingEnemies = [];
+var livingEnemies = [];
 
 function create() {
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    spacegif = game.add(0,0, 800, 600, 'spacegif');
-
-    // //  The scrolling starfield background
-    // starfield = game.add.tileSprite(0, 0, 800, 600, 'starfield');
+    //  The scrolling starfield background
+    starfield = game.add.tileSprite(0, 0, 800, 600, 'starfield');
 
     //  Our bullet group
     bullets = game.add.group();
