@@ -1,4 +1,4 @@
-var game = new Phaser.game(640,360, Phaser .AUTO);
+var game = new Phaser.Game(640,360, Phaser.AUTO);
 
 var GameState = {
     preload: function(){
@@ -11,29 +11,29 @@ var GameState = {
 
     }
 }
-game.state.add('GameState', GameState);
 game.state.start('GameState');
+game.state.add('GameState', GameState);
 
-var config = {
-    type: TTGame2019.AUTO,
-    width: 600,
-    height: 900,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 200 }
-        }
-    },
-    scene: {
-        preload: preload,
-        create: create,
-        handleOrientation: handleOrientation,
-        scores: scores,
-        collectCoin: collectCoin,
-        firing: firing,
-        asteroidCrash: asteroidCrash,
-    }
-};
+// var config = {
+//     type: TTGame2019.AUTO,
+//     width: 600,
+//     height: 900,
+//     physics: {
+//         default: 'arcade',
+//         arcade: {
+//             gravity: { y: 200 }
+//         }
+//     },
+//     scene: {
+//         preload: preload,
+//         create: create,
+//         handleOrientation: handleOrientation,
+//         scores: scores,
+//         collectCoin: collectCoin,
+//         firing: firing,
+//         asteroidCrash: asteroidCrash,
+//     }
+// };
 var leftPressed = false;
 var rightPressed = false;
 var spacebar = false;
@@ -42,14 +42,16 @@ var fireRate = 100;
 var nextFire = 0;
 
 function preload () {
-    game.load.image('space', '../imgs/space.png' );
     game.load.image('rocket', '../imgs/rocket.png');
     game.load.image('asteroid', '../imgs/asteroid.jpg');
     game.load.image('laserBlasts', '../imgs/laserBlasts.jpg');
 }
 
+
+https://phaser.io/examples/v2/games/invaders&sa=D&source=hangouts&ust=1547404099685000&usg=AFQjCNFiaKXSqo9cYyF_hn8tNDlSGTzgAA
+
 function create () {
-    game.add.image(600, 900, 'space');
+    
 
     var rocket = game.add.image(300, 775, 'rocket');
     rocket.setCollideWorldBounds(true);
@@ -81,7 +83,7 @@ function scores() {
     
 }
 
-function collectCoin(rocket, coin) {
+function collectCargo(rocket, cargo) {
     this.physics.add.overlap(coin, rocket, collectCoin, null, this);
     // coin.children.iterate(function (child) 
     //set gravity on coins
