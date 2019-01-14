@@ -47,9 +47,6 @@ function preload () {
     game.load.image('laserBlasts', '../imgs/laserBlasts.jpg');
 }
 
-
-https://phaser.io/examples/v2/games/invaders&sa=D&source=hangouts&ust=1547404099685000&usg=AFQjCNFiaKXSqo9cYyF_hn8tNDlSGTzgAA
-
 function create () {
     
 
