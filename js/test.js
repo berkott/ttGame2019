@@ -41,13 +41,13 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.image('star', 'assets/demoscene/star2.png');
-    this.load.image('bigStar', 'assets/demoscene/star3.png');
-    this.load.image('ship', 'assets/sprites/shmup-ship2.png');
-    this.load.image('bullet', 'assets/sprites/bullets/bullet6.png');
-    this.load.image('jets', 'assets/particles/blue.png');
-    this.load.image('flares', 'assets/particles/yellow.png');
-    this.load.spritesheet('face', 'assets/sprites/metalface78x92.png', { frameWidth: 78, frameHeight: 92 });
+    this.load.image('star', 'rocket.png');
+    this.load.image('bigStar', 'rocket.png');
+    this.load.image('ship', 'rocket.png');
+    this.load.image('bullet', 'rocket.png');
+    this.load.image('jets', 'rocket.png');
+    this.load.image('flares', 'rocket.png');
+    this.load.spritesheet('face', 'rocket.png', { frameWidth: 78, frameHeight: 92 });
 }
 
 function create ()
