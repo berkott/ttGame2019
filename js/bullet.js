@@ -1,7 +1,7 @@
 class Bullet {
     constructor(scene, x){
         this.scene = scene;
-        this.bullets = this.scene.add.sprite(x, 225, 'bullet');
+        this.bullets = this.scene.add.sprite(x, 240, 'bullet');
         // this.fly();
     }
 
@@ -11,14 +11,14 @@ class Bullet {
 
     //what does the return true or false do
     bulletsOut(){
-        if(this.bullets.y > 800){
+        if(this.bullets.y > 960){
             return true;
         }
         return false;
     }
 
-    firing(bullets, bombs) {
-        this.physics.add.collider(bullets, bombs, firing, null, this);
+    firing(bullets, asteroids) {
+        this.physics.add.collider(bullets, asteroids, firing, null, this);
             // set explosion on asteroid
         }
 }

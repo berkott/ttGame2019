@@ -1,8 +1,8 @@
 class Rocket{
     constructor(scene) {
         this.scene = scene;
-        this.rocket = this.scene.add.sprite(200, 200, 'spaceShip');
-        //we need to find the scale of our rocket and make spritesheet
+        this.rocket = this.scene.add.sprite(320, 500, 'spaceShip');
+        //spritesheeet
         // this.player.scaleX = 40;
         // this.player.scaleY = 40;
         
@@ -32,7 +32,7 @@ class Rocket{
 
             if(this.bullets[i].bulletOut() == true){
                 // this.bullets[i].terminate()
-                this.bullets[i].bullet.destroy(true);
+                this.bullets[i].bullets.destroy(true);
                 this.bullets.splice(i, 1);
             }
         }
@@ -44,13 +44,23 @@ class Rocket{
 
     collectCargo(rocket, cargo) {
             this.physics.add.overlap(cargo, rocket, collectCargo, null, this);
+            cargo.destroy(cargo.x, cargo.y); // remove the tile/coin
             // coin.children.iterate(function (child) 
             //set gravity on coins
         }
     
+    collectHatchPanels(rocket, hatchPanels) {
+        this.physics.add.overlap(hatchPanels, rocket, collectHatchPanels, null, this);
+        hatchPanels.destroy(hatchPanels.x, hatchPanels.y); // remove the tile/coin
+        hatchPanelsScore ++; // increment the score
+        text.setText(`Hatch Panels: ${hatchPanelsScore}x`); // set the text to show the current score
+        return false;
+    }
+    
     asteroidCrash(rocket, bombs) {
-            this.physics.pause();
             game.physics.add.collider(rocket, bombs, asteroidCrash, null, this);
+            this.physics.pause();
+            
         // set an explosion after asteroid crashes
             gameOver = true;
         }

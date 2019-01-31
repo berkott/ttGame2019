@@ -1,45 +1,71 @@
 function preload () {
-    this.load.image('space', 'spacegif.jpg');
-    this.load.image('spaceShip', 'rocket.png');
-    this.load.image('alien', 'alien.jpg');
-    this.load.image('bombs', 'asteroid.jpg');
-    this.load.image('cargo', 'cargo.jpg');
-    this.load.image('hatchPanels', 'hatchPanels.jpg');
-    this.load.image('bullets', 'laserBlasts.jpg');
-    this.load.image('primus', 'primus.png');
+    this.load.image('space', '../imgs/spacegif.jpg');
+    this.load.image('spaceShip', '../imgs/rocket.png');
+    this.load.image('alien', '../imgs/alien.jpg');
+    this.load.image('bombs', '../imgs/asteroid.jpg');
+    this.load.image('cargo', '../imgs/cargo.jpg');
+    this.load.image('hatchPanels', '../imgs/hatchPanels.jpg');
+    this.load.image('bullets', '../imgs/laserBlasts.jpg');
+    this.load.image('primus', '../imgs/primus.png');
+    this.load.image('hatchIcon', '../imgs/hatchIcon.png');
 }
 
 function create () {
-    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-    space = this.add.tileSprite(450, 300, 900, 600, 'space');
+    // this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;               //Shows the entire game while maintaining proportions
+    // this.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
+    // this.scale.pageAlignHorizontally = true;                           //Align the game
+    // this.scale.pageAlignVertically = true;
+   
+    space = this.add.tileSprite(480, 320, 960, 640, 'space');
+    
+    primus = this.add.tileSprite(300, 600, 700, 250, 'primus');
     rocket = new Rocket(this);
     controls = new Controls(this);
-// primus
-    primus = this.add.tileSprite(250, 300, 900, 600,'primus');
+//boost
+    // if spacebar = full 
 
-// hatchPanels for upgrades *set repeats continuously for cargo, this, and asteroid
-    asteroid = this.physics.add.sprite({
-        key: 'bombs',
-        repeat: 14,
-        setXY: { x: 12, y: 100, stepX: 70 }
+// // hatchPanels for upgrades *set repeats continuously for cargo, this, and asteroid
+//     asteroid = this.physics.add.group({
+//         key: 'bombs',
+//         repeat: 14,
+//         setXY: { x: Phaser.Math.Between(0, 600), y: Phaser.Math.Between(0, 900), stepX: 70 }
+//     });
+
+//     cargo = this.physics.add.group({
+//         key: 'cargo',
+//         repeat: 14,
+//         setXY: { x: 12, y: 0, stepX: 70 }
+//     });
+    
+//     hatchPanels = this.physics.add.group({
+//         key: 'hatchPanels',
+//         repeat: 2,
+//         setXY: { x: 12, y: 0, stepX: 70, stepY: 10000 }
+//     });
+
+// top header tracker
+    let hatchPanelsCollected = 0; 
+    text = this.add.text(555, 20, `${hatchPanelsCollected}`, {
+        fontSize: '20px',
+        fill: '#ffffff'
+      });
+    text.setScrollFactor(0); 
+
+    let score = space.tilePositionY;
+    score = this.add.text(25, 20, `${score}`, {
+        fontSize: '20px',
+        fill: '#ffffff'
     });
-
-    cargo = this.physics.add.sprite({
-        key: 'cargo',
-        repeat: 14,
-        setXY: { x: 12, y: 100, stepX: 70 }
-    });
-
-    hatchPanels = this.physics.add.sprite({
-        key: 'hatchPanels',
-        repeat: 2,
-        setXY: { x: 12, y:100, stepX: 70, stepY: 10000 }
-    });
-
+      text.setScrollFactor(0); 
+    hatchIcon = this.physics.add.staticGroup();
+    hatchIcon.create(540, 24, 'hatchIcon');
+    
 // alien
-    alien = this.physics.add.sprite();
-
+    alien = this.physics.add.sprite({
+        key: 'alien',
+        repeat: Phaser.Math.Between(1,10),
+        setXY: { x: Phaser.Math.Between(1,10), y: 0, stepY:10000}
+    });
 // black hole portal (maybe not)
 }
 
@@ -48,10 +74,13 @@ function update() {
     rocket.fire(controls.getShooting());
 
     space.tilePositionY -= 2;
-    primus.tilePositionY = space.tilePositionY;
+    primus.tilePositionY -= 2;
 
-    if (primus.tilePositionY <= -250) {
-        this.primus.destroy(true);
-        this.primus.splice(i, 1);
+    // if (rocket == blackhole && boost = True) {
+    //     this.load.image('space', "")
+    // }
+
+    if (primus.tilePositionY <= -370) {
+        primus.destroy();
+        }
     }
-}
