@@ -22,8 +22,12 @@ class Rocket{
             this.rocket.x -= 2;
         } else if(mvmt.right === true){
             this.rocket.x += 2;
+        } else{
+            this.rocket.x =0
         }
     }
+
+    
 
 //?
     fire(shooting){
