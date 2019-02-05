@@ -1,7 +1,7 @@
 class Rocket{
     constructor(scene) {
         this.scene = scene;
-        this.rocket = this.scene.add.sprite(320, 500, 'spaceShip');
+        this.rocket = this.scene.add.sprite(320, 600, 'spaceShip');
         //spritesheeet
         // this.player.scaleX = 40;
         // this.player.scaleY = 40;
@@ -26,8 +26,6 @@ class Rocket{
             this.rocket.x =0
         }
     }
-
-    
 
 //?
     fire(shooting){
@@ -64,8 +62,24 @@ class Rocket{
     asteroidCrash(rocket, bombs) {
             game.physics.add.collider(rocket, bombs, asteroidCrash, null, this);
             this.physics.pause();
-            
+            new Explosions();
         // set an explosion after asteroid crashes
             gameOver = true;
         }
     }
+
+    //this.physics.add.overlap(this.player, this.coinGroup, function(player, coin){
+    //     this.tweens.add({
+    //         targets: coin,
+    //         y: coin.y - 100,
+    //         alpha: 0,
+    //         duration: 800,
+    //         ease: "Cubic.easeOut",
+    //         callbackScope: this,
+    //         onComplete: function(){
+    //             this.coinGroup.killAndHide(coin);
+    //             this.coinGroup.remove(coin);
+    //         }
+    //     });
+
+    // }, null, this);

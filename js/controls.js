@@ -1,5 +1,4 @@
 class Controls{
-
     constructor (scene){
         this.scene = scene;
 

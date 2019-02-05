@@ -1,3 +1,4 @@
+window.onload = function() {
  let config = {
     type: Phaser.AUTO,
     width: 640,
@@ -12,6 +13,7 @@
         arcade: {
             gravity: { y: 100 }
         }
-    }
-};
+      }
+   };
+}
 let game = new Phaser.Game(config);
