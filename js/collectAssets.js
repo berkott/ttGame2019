@@ -6,7 +6,7 @@ assetCreate() {
     this.cargo.setGravityY(gameOptions.cargoGravity);
     this.hatchPanels.setGravityY(gameOptions.hatchPanelsGravity);
     this.asteroid.setGravitY(gameOptions.asteroidGravity);
-    
+
     if(Phaser.Math.Between(1, 100) <= gameOptions.cargoPercent){
         if(this.cargoPool.getLength()){
             let cargo = this.cargoPool.getFirst();
@@ -51,7 +51,7 @@ assetCreate() {
             if(this.asteroidPool.getLength()){
                 let asteroid = this.asteroidPool.getFirst();
                 asteroid.x = posX;
-                asteroid.y = posY - 96;
+                asteroid.y = posY - d;
                 asteroid.alpha = 1;
                 asteroid.active = true;
                 asteroid.visible = true;
@@ -103,5 +103,29 @@ assetCreate() {
         asteroid.scene.hatchPanelsGroup.add(asteroid)
             }
         });
+    }
+
+assetRecycle() {
+    this.cargoGroup.getChildren().forEach(function(cargo){
+        if(cargo.x < - cargo.displayWidth / 2){
+            this.cargoGroup.killAndHide(cargo);
+            this.cargoGroup.remove(cargo);
+        }
+    }, this);
+
+    this.hatchPanelsGroup.getChildren().forEach(function(hatchPanels){
+        if(hatchPanels.x < - hatchPanels.displayWidth / 2){
+            this.hatchPanelsGroup.killAndHide(hatchPanels);
+            this.hatchPanelsGroup.remove(hatchPanels);
+        }
+     }, this);
+
+    // recycling asteroid
+    this.asteroidGroup.getChildren().forEach(function(asteroid){
+        if(asteroid.x < - asteroid.displayWidth / 2){
+            this.asteroidGroup.killAndHide(asteroid);
+            this.asteroidGroup.remove(asteroid);
+            }
+        }, this);
     }
 }

@@ -2,12 +2,13 @@ class Controls{
     constructor (scene){
         this.scene = scene;
 
-        this.left = false;
+        this.up = false;
         this.right = false;
         this.space = false;
 
+
         this.keyboard();
-        window.addEventListener('deviceorientation', handleOrientation);
+        // window.addEventListener('deviceorientation');
     }
       
 handleOrientation(event) {

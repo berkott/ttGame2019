@@ -1,8 +1,8 @@
 let gameOptions = {
-    cargoPercent: 20,
+    cargoPercent: 10,
     alienPercent: 5,
     hatchPanelsPercent: 20,
-    asteroidPercent: 100 
+    asteroidPercent:  
 }
 function preload () {
     this.load.image('space', '../imgs/spacegif.jpg');
