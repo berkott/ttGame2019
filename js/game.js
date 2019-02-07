@@ -1,19 +1,14 @@
-let gameOptions = {
-    cargoPercent: 10,
-    alienPercent: 5,
-    hatchPanelsPercent: 20,
-    asteroidPercent:  
-}
+
 function preload () {
-    this.load.image('space', '../imgs/spacegif.jpg');
-    this.load.image('spaceShip', '../imgs/rocket.png');
-    this.load.image('alien', '../imgs/alien1.png');
-    this.load.image('bombs', '../imgs/asteroid.jpg');
-    this.load.image('cargo', '../imgs/cargo.jpg');
-    this.load.image('hatchPanels', '../imgs/hatchPanels.jpg');
-    this.load.image('bullets', '../imgs/laserBlasts.jpg');
-    this.load.image('primus', '../imgs/primus.png');
-    this.load.image('hatchIcon', '../imgs/hatchIcon.png');
+    this.load.image('space', './imgs/spacegif.jpg');
+    this.load.image('spaceShip', './imgs/rocket.png');
+    this.load.image('alien', './imgs/alien1.png');
+    this.load.image('bombs', './imgs/asteroid.jpg');
+    this.load.image('cargo', './imgs/cargo.jpg');
+    this.load.image('hatchPanels', './imgs/hatchPanels.jpg');
+    this.load.image('bullets', './imgs/laserBlasts.jpg');
+    this.load.image('primus', './imgs/primus.png');
+    this.load.image('hatchIcon', './imgs/hatchIcon.png');
 
     this.anims.create({
         key: "rotate",
@@ -93,4 +88,10 @@ function update() {
     if (primus.tilePositionY <= -370) {
         primus.destroy();
     }
+}
+let gameOptions = {
+    cargoPercent: 10,
+    alienPercent: 5,
+    hatchPanelsPercent: 20,
+    asteroidPercent: 100
 }
