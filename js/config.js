@@ -1,4 +1,3 @@
-window.onload = function() {
  let config = {
     type: Phaser.AUTO,
     width: 640,
@@ -15,5 +14,4 @@ window.onload = function() {
         }
       }
    };
-}
 let game = new Phaser.Game(config);

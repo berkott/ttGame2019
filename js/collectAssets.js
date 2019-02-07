@@ -2,32 +2,11 @@ class collectAssets {
     constructor(scene) {
         this.scene= scene;
     }
-assetsAnimation() {
-    this.anims.create({
-        key: "rotate",
-        frames: this.anims.generateFrameNumbers("cargo", {
-            start: 0,
-            end: 5
-        }),
-        frameRate: 5,
-        yoyo: true,
-        repeat: -1
-     });
-
-    this.anims.create({
-        key: "rotate",
-        frames: this.anims.generateFrameNumbers("hatchPanels", {
-            start: 0,
-            end: 5
-        }),
-        frameRate: 10,
-        yoyo: true,
-        repeat: -1
-    });
-
-
-}   
 assetCreate() {
+    this.cargo.setGravityY(gameOptions.cargoGravity);
+    this.hatchPanels.setGravityY(gameOptions.hatchPanelsGravity);
+    this.asteroid.setGravitY(gameOptions.asteroidGravity);
+    
     if(Phaser.Math.Between(1, 100) <= gameOptions.cargoPercent){
         if(this.cargoPool.getLength()){
             let cargo = this.cargoPool.getFirst();

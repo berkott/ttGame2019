@@ -7,7 +7,17 @@ class Controls{
         this.space = false;
 
         this.keyboard();
+        window.addEventListener('deviceorientation', handleOrientation);
     }
+      
+handleOrientation(event) {
+    var y = event.gamma; // In degree in the range [-90,90]
+    output.innerHTML += "gamma: " + y + "\n";
+    y += 90;
+    // rocket size is 80 by 150; 40 is half of its size
+    // It center the positioning point to the center of the ball
+    rocket.style.left = (maxY*y/180 - 40) + "px";
+}
 
     keyboard(){
         this.scene.input.keyboard.on('keydown_ArrowLeft', (e) => { this.left = true });
