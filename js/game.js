@@ -6,7 +6,7 @@ let gameOptions = {
     rocketStartPosition: 320,
     cargoPercent: 10,
     alienPercent: 5,
-    hatchPanelsPercent: 20,
+    hatchPanelsPercent: 100,
     asteroidPercent: 100
 }
 
@@ -59,6 +59,7 @@ function create() {
     hatchIcon.create(600, 24, 'hatchIcon');
 
 
+    let score = 0;
     scoreText = this.add.text(25, 20, `Score:0`, {
         fontSize: '20px',
         fill: '#ffffff'
@@ -78,7 +79,7 @@ function create() {
 // black hole portal (maybe not)
 
 function update() {
-    console.log(controls.getMotion())
+    // console.log(controls.getMotion())
     rocket.move(controls.getMotion());
     rocket.fire(controls.getShooting());
 
