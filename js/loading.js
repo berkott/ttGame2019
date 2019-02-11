@@ -1,18 +1,8 @@
-var config = {
-    type: Phaser.AUTO,
-    parent: 'phaser-example',
-    width: 640,
-    height: 960,
-    scene: {
-        preload: preload,
-        create: create
-    }
-};
-
-// Create a new Phaser Game object
-var game = new Phaser.Game(config);
-
-function preload() {
+class Loading{
+    constructor(scene){
+        this.scene = scene;
+}
+loading() {
     var progressBar = this.add.graphics();
     var progressBox = this.add.graphics();
     progressBox.fillStyle(0x222222, 0.8);
@@ -75,9 +65,13 @@ function preload() {
     this.load.image('logo', '../imgs/technoTitanLogo.png');
         for (var i = 0; i < 5000; i++) {
             this.load.image('logo'+i, '../imgs/technoTitanLogo.png');
+        }
     }
-}
 
-function create() {
+loadScreen() {
     logo = this.add.image(400, 300, 'logo');
+    if(logo.posX == 400) {
+        this.scene.start(Game);
+        }
+    }
 }

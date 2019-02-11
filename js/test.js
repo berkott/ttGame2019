@@ -1,353 +1,458 @@
-var config = {
-    type: Phaser.WEBGL,
-    width: 800,
-    height: 600,
-    parent: 'phaser-example',
-    physics: {
-        default: 'impact',
-        impact: {
-            setBounds: {
-                x: 0,
-                y: 0,
-                width: 3200,
-                height: 600,
-                thickness: 32
+let game;
+ 
+// global game options
+let gameOptions = {
+ 
+    // platform speed range, in pixels per second
+    platformSpeedRange: [300, 300],
+ 
+    // mountain speed, in pixels per second
+    mountainSpeed: 80,
+ 
+    // spawn range, how far should be the rightmost platform from the right edge
+    // before next platform spawns, in pixels
+    spawnRange: [80, 300],
+ 
+    // platform width range, in pixels
+    platformSizeRange: [90, 300],
+ 
+    // a height range between rightmost platform and next platform to be spawned
+    platformHeightRange: [-5, 5],
+ 
+    // a scale to be multiplied by platformHeightRange
+    platformHeighScale: 20,
+ 
+    // platform max and min height, as screen height ratio
+    platformVerticalLimit: [0.4, 0.8],
+ 
+    // player gravity
+    playerGravity: 900,
+ 
+    // player jump force
+    jumpForce: 400,
+ 
+    // player starting X position
+    playerStartPosition: 200,
+ 
+    // consecutive jumps allowed
+    jumps: 2,
+ 
+    // % of probability a coin appears on the platform
+    coinPercent: 25,
+ 
+    // % of probability a fire appears on the platform
+    firePercent: 25
+}
+ 
+window.onload = function() {
+ 
+    // object containing configuration options
+    let gameConfig = {
+        type: Phaser.AUTO,
+        width: 1334,
+        height: 750,
+        scene: [preloadGame, playGame],
+        backgroundColor: 0x0c88c7,
+ 
+        // physics settings
+        physics: {
+            default: "arcade"
+        }
+    }
+    game = new Phaser.Game(gameConfig);
+    window.focus();
+    resize();
+    window.addEventListener("resize", resize, false);
+}
+ 
+// preloadGame scene
+class preloadGame extends Phaser.Scene{
+    constructor(){
+        super("PreloadGame");
+    }
+    preload(){
+        this.load.image("platform", "../imgs/platform1.png");
+ 
+        // player is a sprite sheet made by 24x48 pixels
+        this.load.spritesheet("player", "../imgs/player1.png", {
+            frameWidth: 24,
+            frameHeight: 48
+        });
+ 
+        // the coin is a sprite sheet made by 20x20 pixels
+        this.load.spritesheet("coin", "../imgs/coin1.png", {
+            frameWidth: 20,
+            frameHeight: 20
+        });
+ 
+        // the firecamp is a sprite sheet made by 32x58 pixels
+        this.load.spritesheet("fire", "../imgs/fire1.png", {
+            frameWidth: 40,
+            frameHeight: 70
+        });
+ 
+        // mountains are a sprite sheet made by 512x512 pixels
+        this.load.spritesheet("mountain", "../imgs/mountain1.png", {
+            frameWidth: 512,
+            frameHeight: 512
+        });
+    }
+    create(){
+ 
+        // setting player animation
+        this.anims.create({
+            key: "run",
+            frames: this.anims.generateFrameNumbers("player", {
+                start: 0,
+                end: 1
+            }),
+            frameRate: 8,
+            repeat: -1
+        });
+ 
+        // setting coin animation
+        this.anims.create({
+            key: "rotate",
+            frames: this.anims.generateFrameNumbers("coin", {
+                start: 0,
+                end: 5
+            }),
+            frameRate: 15,
+            yoyo: true,
+            repeat: -1
+        });
+ 
+        // setting fire animation
+        this.anims.create({
+            key: "burn",
+            frames: this.anims.generateFrameNumbers("fire", {
+                start: 0,
+                end: 4
+            }),
+            frameRate: 15,
+            repeat: -1
+        });
+ 
+        this.scene.start("PlayGame");
+    }
+}
+ 
+// playGame scene
+class playGame extends Phaser.Scene{
+    constructor(){
+        super("PlayGame");
+    }
+    create(){
+ 
+        // group with all active mountains.
+        this.mountainGroup = this.add.group();
+ 
+        // group with all active platforms.
+        this.platformGroup = this.add.group({
+ 
+            // once a platform is removed, it's added to the pool
+            removeCallback: function(platform){
+                platform.scene.platformPool.add(platform)
+            }
+        });
+ 
+        // platform pool
+        this.platformPool = this.add.group({
+ 
+            // once a platform is removed from the pool, it's added to the active platforms group
+            removeCallback: function(platform){
+                platform.scene.platformGroup.add(platform)
+            }
+        });
+ 
+        // group with all active coins.
+        this.coinGroup = this.add.group({
+ 
+            // once a coin is removed, it's added to the pool
+            removeCallback: function(coin){
+                coin.scene.coinPool.add(coin)
+            }
+        });
+ 
+        // coin pool
+        this.coinPool = this.add.group({
+ 
+            // once a coin is removed from the pool, it's added to the active coins group
+            removeCallback: function(coin){
+                coin.scene.coinGroup.add(coin)
+            }
+        });
+ 
+        // group with all active firecamps.
+        this.fireGroup = this.add.group({
+ 
+            // once a firecamp is removed, it's added to the pool
+            removeCallback: function(fire){
+                fire.scene.firePool.add(fire)
+            }
+        });
+ 
+        // fire pool
+        this.firePool = this.add.group({
+ 
+            // once a fire is removed from the pool, it's added to the active fire group
+            removeCallback: function(fire){
+                fire.scene.fireGroup.add(fire)
+            }
+        });
+ 
+        // adding a mountain
+        this.addMountains()
+ 
+        // keeping track of added platforms
+        this.addedPlatforms = 0;
+ 
+        // number of consecutive jumps made by the player so far
+        this.playerJumps = 0;
+ 
+        // adding a platform to the game, the arguments are platform width, x position and y position
+        this.addPlatform(game.config.width, game.config.width / 2, game.config.height * gameOptions.platformVerticalLimit[1]);
+ 
+        // adding the player;
+        this.player = this.physics.add.sprite(gameOptions.playerStartPosition, game.config.height * 0.7, "player");
+        this.player.setGravityY(gameOptions.playerGravity);
+        this.player.setDepth(2);
+ 
+        // the player is not dying
+        this.dying = false;
+ 
+        // setting collisions between the player and the platform group
+        this.platformCollider = this.physics.add.collider(this.player, this.platformGroup, function(){
+ 
+            // play "run" animation if the player is on a platform
+            if(!this.player.anims.isPlaying){
+                this.player.anims.play("run");
+            }
+        }, null, this);
+ 
+        // setting collisions between the player and the coin group
+        this.physics.add.overlap(this.player, this.coinGroup, function(player, coin){
+ 
+            this.tweens.add({
+                targets: coin,
+                y: coin.y - 100,
+                alpha: 0,
+                duration: 800,
+                ease: "Cubic.easeOut",
+                callbackScope: this,
+                onComplete: function(){
+                    this.coinGroup.killAndHide(coin);
+                    this.coinGroup.remove(coin);
+                }
+            });
+ 
+        }, null, this);
+ 
+        // setting collisions between the player and the fire group
+        this.physics.add.overlap(this.player, this.fireGroup, function(player, fire){
+ 
+            this.dying = true;
+            this.player.anims.stop();
+            this.player.setFrame(2);
+            this.player.body.setVelocityY(-200);
+            this.physics.world.removeCollider(this.platformCollider);
+ 
+        }, null, this);
+ 
+        // checking for input
+        this.input.on("pointerdown", this.jump, this);
+    }
+ 
+    // adding mountains
+    addMountains(){
+        let rightmostMountain = this.getRightmostMountain();
+        if(rightmostMountain < game.config.width * 2){
+            let mountain = this.physics.add.sprite(rightmostMountain + Phaser.Math.Between(100, 350), game.config.height + Phaser.Math.Between(0, 100), "mountain");
+            mountain.setOrigin(0.5, 1);
+            mountain.body.setVelocityX(gameOptions.mountainSpeed * -1)
+            this.mountainGroup.add(mountain);
+            if(Phaser.Math.Between(0, 1)){
+                mountain.setDepth(1);
+            }
+            mountain.setFrame(Phaser.Math.Between(0, 3))
+            this.addMountains()
+        }
+    }
+ 
+    // getting rightmost mountain x position
+    getRightmostMountain(){
+        let rightmostMountain = -200;
+        this.mountainGroup.getChildren().forEach(function(mountain){
+            rightmostMountain = Math.max(rightmostMountain, mountain.x);
+        })
+        return rightmostMountain;
+    }
+ 
+    // the core of the script: platform are added from the pool or created on the fly
+    addPlatform(platformWidth, posX, posY){
+        this.addedPlatforms ++;
+        let platform;
+        if(this.platformPool.getLength()){
+            platform = this.platformPool.getFirst();
+            platform.x = posX;
+            platform.y = posY;
+            platform.active = true;
+            platform.visible = true;
+            this.platformPool.remove(platform);
+            let newRatio =  platformWidth / platform.displayWidth;
+            platform.displayWidth = platformWidth;
+            platform.tileScaleX = 1 / platform.scaleX;
+        }
+        else{
+            platform = this.add.tileSprite(posX, posY, platformWidth, 32, "platform");
+            this.physics.add.existing(platform);
+            platform.body.setImmovable(true);
+            platform.body.setVelocityX(Phaser.Math.Between(gameOptions.platformSpeedRange[0], gameOptions.platformSpeedRange[1]) * -1);
+            platform.setDepth(2);
+            this.platformGroup.add(platform);
+        }
+        this.nextPlatformDistance = Phaser.Math.Between(gameOptions.spawnRange[0], gameOptions.spawnRange[1]);
+ 
+        // if this is not the starting platform...
+        if(this.addedPlatforms > 1){
+ 
+            // is there a coin over the platform?
+            if(Phaser.Math.Between(1, 100) <= gameOptions.coinPercent){
+                if(this.coinPool.getLength()){
+                    let coin = this.coinPool.getFirst();
+                    coin.x = posX;
+                    coin.y = posY - 96;
+                    coin.alpha = 1;
+                    coin.active = true;
+                    coin.visible = true;
+                    this.coinPool.remove(coin);
+                }
+                else{
+                    let coin = this.physics.add.sprite(posX, posY - 96, "coin");
+                    coin.setImmovable(true);
+                    coin.setVelocityX(platform.body.velocity.x);
+                    coin.anims.play("rotate");
+                    coin.setDepth(2);
+                    this.coinGroup.add(coin);
+                }
+            }
+ 
+            // is there a fire over the platform?
+            if(Phaser.Math.Between(1, 100) <= gameOptions.firePercent){
+                if(this.firePool.getLength()){
+                    let fire = this.firePool.getFirst();
+                    fire.x = posX - platformWidth / 2 + Phaser.Math.Between(1, platformWidth);
+                    fire.y = posY - 46;
+                    fire.alpha = 1;
+                    fire.active = true;
+                    fire.visible = true;
+                    this.firePool.remove(fire);
+                }
+                else{
+                    let fire = this.physics.add.sprite(posX - platformWidth / 2 + Phaser.Math.Between(1, platformWidth), posY - 46, "fire");
+                    fire.setImmovable(true);
+                    fire.setVelocityX(platform.body.velocity.x);
+                    fire.setSize(8, 2, true)
+                    fire.anims.play("burn");
+                    fire.setDepth(2);
+                    this.fireGroup.add(fire);
+                }
             }
         }
-    },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update,
-        extend: {
-            minimap: null,
-            player: null,
-            cursors: null,
-            thrust: null,
-            flares: null,
-            bullets: null,
-            lastFired: 0,
-            text: null,
-            createBulletEmitter: createBulletEmitter,
-            createStarfield: createStarfield,
-            createLandscape: createLandscape,
-            createAliens: createAliens,
-            createThrustEmitter: createThrustEmitter
+    }
+ 
+    // the player jumps when on the ground, or once in the air as long as there are jumps left and the first jump was on the ground
+    // and obviously if the player is not dying
+    jump(){
+        if((!this.dying) && (this.player.body.touching.down || (this.playerJumps > 0 && this.playerJumps < gameOptions.jumps))){
+            if(this.player.body.touching.down){
+                this.playerJumps = 0;
+            }
+            this.player.setVelocityY(gameOptions.jumpForce * -1);
+            this.playerJumps ++;
+ 
+            // stops animation
+            this.player.anims.stop();
+        }
+    }
+ 
+    update(){
+ 
+        // game over
+        if(this.player.y > game.config.height){
+            this.scene.start("PlayGame");
+        }
+ 
+        this.player.x = gameOptions.playerStartPosition;
+ 
+        // recycling platforms
+        let minDistance = game.config.width;
+        let rightmostPlatformHeight = 0;
+        this.platformGroup.getChildren().forEach(function(platform){
+            let platformDistance = game.config.width - platform.x - platform.displayWidth / 2;
+            if(platformDistance < minDistance){
+                minDistance = platformDistance;
+                rightmostPlatformHeight = platform.y;
+            }
+            if(platform.x < - platform.displayWidth / 2){
+                this.platformGroup.killAndHide(platform);
+                this.platformGroup.remove(platform);
+            }
+        }, this);
+ 
+        // recycling coins
+        this.coinGroup.getChildren().forEach(function(coin){
+            if(coin.x < - coin.displayWidth / 2){
+                this.coinGroup.killAndHide(coin);
+                this.coinGroup.remove(coin);
+            }
+        }, this);
+ 
+        // recycling fire
+        this.fireGroup.getChildren().forEach(function(fire){
+            if(fire.x < - fire.displayWidth / 2){
+                this.fireGroup.killAndHide(fire);
+                this.fireGroup.remove(fire);
+            }
+        }, this);
+ 
+        // recycling mountains
+        this.mountainGroup.getChildren().forEach(function(mountain){
+            if(mountain.x < - mountain.displayWidth){
+                let rightmostMountain = this.getRightmostMountain();
+                mountain.x = rightmostMountain + Phaser.Math.Between(100, 350);
+                mountain.y = game.config.height + Phaser.Math.Between(0, 100);
+                mountain.setFrame(Phaser.Math.Between(0, 3))
+                if(Phaser.Math.Between(0, 1)){
+                    mountain.setDepth(1);
+                }
+            }
+        }, this);
+ 
+        // adding new platforms
+        if(minDistance > this.nextPlatformDistance){
+            let nextPlatformWidth = Phaser.Math.Between(gameOptions.platformSizeRange[0], gameOptions.platformSizeRange[1]);
+            let platformRandomHeight = gameOptions.platformHeighScale * Phaser.Math.Between(gameOptions.platformHeightRange[0], gameOptions.platformHeightRange[1]);
+            let nextPlatformGap = rightmostPlatformHeight + platformRandomHeight;
+            let minPlatformHeight = game.config.height * gameOptions.platformVerticalLimit[0];
+            let maxPlatformHeight = game.config.height * gameOptions.platformVerticalLimit[1];
+            let nextPlatformHeight = Phaser.Math.Clamp(nextPlatformGap, minPlatformHeight, maxPlatformHeight);
+            this.addPlatform(nextPlatformWidth, game.config.width + nextPlatformWidth / 2, nextPlatformHeight);
         }
     }
 };
-
-var game = new Phaser.Game(config);
-
-function preload ()
-{
-    this.load.image('star', 'rocket.png');
-    this.load.image('bigStar', 'rocket.png');
-    this.load.image('ship', 'rocket.png');
-    this.load.image('bullet', 'rocket.png');
-    this.load.image('jets', 'rocket.png');
-    this.load.image('flares', 'rocket.png');
-    this.load.spritesheet('face', 'rocket.png', { frameWidth: 78, frameHeight: 92 });
-}
-
-function create ()
-{
-    var Bullet = new Phaser.Class({
-
-        Extends: Phaser.GameObjects.Image,
-
-        initialize:
-
-        function Bullet (scene)
-        {
-            Phaser.GameObjects.Image.call(this, scene, 0, 0, 'bullet');
-
-            this.speed = 0;
-            this.born = 0;
-        },
-
-        fire: function (player)
-        {
-            this.setPosition(player.x, player.y);
-
-            if (player.flipX)
-            {
-                //  Facing left
-                this.speed = Phaser.Math.GetSpeed(-1000 + player.vel.x, 1);
-            }
-            else
-            {
-                //  Facing right
-                this.speed = Phaser.Math.GetSpeed(1000 + player.vel.x, 1);
-            }
-
-            this.born = 0;
-        },
-
-        update: function (time, delta)
-        {
-            this.x += this.speed * delta;
-
-            this.born += delta;
-
-            if (this.born > 1000)
-            {
-                this.setActive(false);
-                this.setVisible(false);
-            }
-        }
-
-    });
-
-    //  The world is 3200 x 600 in size
-    this.cameras.main.setBounds(0, 0, 3200, 600);
-
-    //  The miniCam is 400px wide, so can display the whole world at a zoom of 0.2
-    // this.minimap = this.cameras.add(200, 10, 400, 100).setZoom(0.2);
-    // this.minimap.setBackgroundColor(0x002244);
-    // this.minimap.scrollX = 1600;
-    // this.minimap.scrollY = 300;
-
-    this.createStarfield();
-    this.createLandscape();
-    this.createAliens();
-    this.createThrustEmitter();
-    this.createBulletEmitter();
-
-    //  Bullets
-
-    this.bullets = this.add.group({ classType: Bullet, runChildUpdate: true });
-
-    //  Add a player ship
-
-    this.player = this.impact.add.sprite(1600, 200, 'ship').setDepth(1);
-    this.player.setMaxVelocity(1000).setFriction(800, 600).setPassiveCollision();
-
-    this.cursors = this.input.keyboard.createCursorKeys();
-
-    this.text = this.add.text(10, 10, '', { font: '16px Courier', fill: '#00ff00' }).setDepth(1).setScrollFactor(0);
-}
-
-function update (time, delta)
-{
-    this.thrust.setPosition(this.player.x, this.player.y);
-
-    if (this.cursors.left.isDown)
-    {
-        this.player.setAccelerationX(-800);
-        this.player.flipX = true;
+function resize(){
+    let canvas = document.querySelector("canvas");
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+    let windowRatio = windowWidth / windowHeight;
+    let gameRatio = game.config.width / game.config.height;
+    if(windowRatio < gameRatio){
+        canvas.style.width = windowWidth + "px";
+        canvas.style.height = (windowWidth / gameRatio) + "px";
     }
-    else if (this.cursors.right.isDown)
-    {
-        this.player.setAccelerationX(800);
-        this.player.flipX = false;
-    }
-    else
-    {
-        this.player.setAccelerationX(0);
-    }
-
-    if (this.cursors.up.isDown)
-    {
-        this.player.setAccelerationY(-800);
-    }
-    else if (this.cursors.down.isDown)
-    {
-        this.player.setAccelerationY(800);
-    }
-    else
-    {
-        this.player.setAccelerationY(0);
-    }
-
-    if (this.player.vel.x < 0)
-    {
-        this.thrust.setPosition(this.thrust.x.propertyValue += (this.player.flipX) ? 16 : -16, this.thrust.y.propertyValue);
-        this.thrust.setSpeed(this.player.vel.x / 2);
-        this.thrust.emitParticle(16);
-    }
-    else if (this.player.vel.x > 0)
-    {
-        this.thrust.setPosition(this.thrust.x.propertyValue += (this.player.flipX) ? 16 : -16, this.thrust.y.propertyValue);
-        this.thrust.setSpeed(this.player.vel.x / 2);
-        this.thrust.emitParticle(16);
-    }
-
-    if (this.cursors.space.isDown && time > this.lastFired)
-    {
-        var bullet = this.bullets.get();
-        bullet.setActive(true);
-        bullet.setVisible(true);
-
-        if (bullet)
-        {
-            bullet.fire(this.player);
-
-            this.lastFired = time + 100;
-        }
-    }
-
-    //  Emitters to bullets
-
-    this.bullets.children.each(function(b) {
-        if (b.active)
-        {
-            this.flares.setPosition(b.x, b.y);
-            this.flares.setSpeed(b.speed + 500 * -1);
-            this.flares.emitParticle(1);
-        }
-    }, this);
-
-    this.text.setText(this.player.vel.x);
-
-    //  Position the center of the camera on the player
-    //  We -400 because the camera width is 800px and
-    //  we want the center of the camera on the player, not the left-hand side of it
-    this.cameras.main.scrollX = this.player.x - 400;
-
-    //  And this camera is 400px wide, so -200
-    // this.minimap.scrollX = Phaser.Math.Clamp(this.player.x - 200, 800, 2000);
-}
-
-function createBulletEmitter ()
-{
-    this.flares = this.add.particles('flares').createEmitter({
-        x: 1600,
-        y: 200,
-        angle: { min: 170, max: 190 },
-        scale: { start: 0.4, end: 0.2 },
-        blendMode: 'ADD',
-        lifespan: 500,
-        on: false
-    });
-}
-
-function createThrustEmitter ()
-{
-    this.thrust = this.add.particles('jets').createEmitter({
-        x: 1600,
-        y: 200,
-        angle: { min: 160, max: 200 },
-        scale: { start: 0.2, end: 0 },
-        blendMode: 'ADD',
-        lifespan: 600,
-        on: false
-    });
-}
-
-function createStarfield ()
-{
-    //  Starfield background
-
-    //  Note the scrollFactor values which give them their 'parallax' effect
-
-    var group = this.add.group({ key: 'star', frameQuantity: 256 });
-
-    group.createMultiple({ key: 'bigStar', frameQuantity: 32 });
-
-    var rect = new Phaser.Geom.Rectangle(0, 0, 3200, 550);
-
-    Phaser.Actions.RandomRectangle(group.getChildren(), rect);
-
-    group.children.iterate(function (child, index) {
-
-        var sf = Math.max(0.3, Math.random());
-
-        if (child.texture.key === 'bigStar')
-        {
-            sf = 0.2;
-        }
-
-        child.setScrollFactor(sf);
-
-        // this.minimap.ignore(child);
-
-    }, this);
-}
-
-function createLandscape ()
-{
-    //  Draw a random 'landscape'
-
-    var landscape = this.add.graphics();
-
-    landscape.fillStyle(0x008800, 1);
-    landscape.lineStyle(2, 0x00ff00, 1);
-
-    landscape.beginPath();
-
-    var maxY = 550;
-    var minY = 400;
-
-    var x = 0;
-    var y = maxY;
-    var range = 0;
-
-    var up = true;
-
-    landscape.moveTo(0, 600);
-    landscape.lineTo(0, 550);
-
-    do
-    {
-        //  How large is this 'side' of the mountain?
-        range = Phaser.Math.Between(20, 100);
-
-        if (up)
-        {
-            y = Phaser.Math.Between(y, minY);
-            up = false;
-        }
-        else
-        {
-            y = Phaser.Math.Between(y, maxY);
-            up = true;
-        }
-
-        landscape.lineTo(x + range, y);
-
-        x += range;
-
-    } while (x < 3100);
-
-    landscape.lineTo(3200, maxY);
-    landscape.lineTo(3200, 600);
-    landscape.closePath();
-
-    landscape.strokePath();
-    landscape.fillPath();
-}
-
-function createAliens ()
-{
-    //  Create some random aliens moving slowly around
-
-    var config = {
-        key: 'metaleyes',
-        frames: this.anims.generateFrameNumbers('face', { start: 0, end: 4 }),
-        frameRate: 20,
-        repeat: -1
-    };
-
-    this.anims.create(config);
-
-    for (var i = 0; i < 32; i++)
-    {
-        var x = Phaser.Math.Between(100, 3100);
-        var y = Phaser.Math.Between(100, 300);
-
-        var face = this.impact.add.sprite(x, y, 'face').play('metaleyes');
-
-        face.setLiteCollision().setBounce(1).setBodyScale(0.5);
-        face.setVelocity(Phaser.Math.Between(20, 60), Phaser.Math.Between(20, 60));
-
-        if (Math.random() > 0.5)
-        {
-            face.vel.x *= -1;
-        }
-        else
-        {
-            face.vel.y *= -1;
-        }
+    else{
+        canvas.style.width = (windowHeight * gameRatio) + "px";
+        canvas.style.height = windowHeight + "px";
     }
 }

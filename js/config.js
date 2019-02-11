@@ -1,8 +1,11 @@
- let config = {
+window.onload = function() {
+let config = {
     type: Phaser.AUTO,
     width: 640,
     height: 960,
     scene: {
+        // loading: loading,
+        // loadScreen: loadScreen,
         preload: preload,
         create: create,
         update: update
@@ -12,6 +15,12 @@
         arcade: {
             gravity: { y: 100 }
         }
-      }
-   };
-let game = new Phaser.Game(config);
+    }
+}
+
+game = new Phaser.Game(config);
+
+window.focus();
+    resize();
+    window.addEventListener("resize", resize, false);
+}

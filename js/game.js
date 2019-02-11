@@ -1,26 +1,39 @@
+let game;
 
-function preload () {
+let gameOptions = {
+    asteroidSpeedRange: [200, 200],
+    spaceSpeed: 80,
+    rocketStartPosition: 320,
+    cargoPercent: 10,
+    alienPercent: 5,
+    hatchPanelsPercent: 20,
+    asteroidPercent: 100
+}
+
+function preload() {
     this.load.image('space', './imgs/spacegif.jpg');
     this.load.image('spaceShip', './imgs/rocket.png');
-    this.load.image('alien', './imgs/alien1.png');
+    this.load.image('alien', './imgs/alien.gif');
     this.load.image('bombs', './imgs/asteroid.jpg');
     this.load.image('cargo', './imgs/cargo.jpg');
-    this.load.image('hatchPanels', './imgs/hatchPanels.jpg');
+    this.load.image('hatchPanels', './imgs/hatchPanel.png');
     this.load.image('bullets', './imgs/laserBlasts.jpg');
     this.load.image('primus', './imgs/primus.png');
     this.load.image('hatchIcon', './imgs/hatchIcon.png');
+}
 
-    this.anims.create({
-        key: "rotate",
-        frames: this.anims.generateFrameNumbers("cargo", {
-            start: 0,
-            end: 5
-        }),
-        frameRate: 5,
-        yoyo: true,
-        repeat: -1
-        });
-    
+let space;
+let primus;
+let rocket;
+let controls;
+let collectAsset;
+
+function create() {
+    space = this.add.tileSprite(320, 480, 640, 960, 'space');
+    primus = this.add.tileSprite(200, 960, 640, 300, 'primus');
+    rocket = new Rocket(this);
+    controls = new Controls(this);
+
     this.anims.create({
         key: "rotate",
         frames: this.anims.generateFrameNumbers("hatchPanels", {
@@ -30,56 +43,48 @@ function preload () {
         frameRate: 10,
         yoyo: true,
         repeat: -1
-      });
-}
-
-function create () {
-    // this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;               //Shows the entire game while maintaining proportions
-    // this.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
-    // this.scale.pageAlignHorizontally = true;                           //Align the game
-    // this.scale.pageAlignVertically = true;
-
-    space = this.add.tileSprite(480, 320, 960, 640, 'space');
-    
-    primus = this.add.tileSprite(300, 600, 700, 250, 'primus');
-    rocket = new Rocket(this);
-    controls = new Controls(this);
-    collectAssets = new collectAssets(this);
-    // collectAssets = new collectAssets(this);
-//boost
+    });
+    collectAsset = new collectAssets(this);
+    //boost
     // if spacebar = full 
 
-// top header tracker
-    let hatchPanelsCollected = 0; 
-    text = this.add.text(610, 20, `${hatchPanelsCollected}`, {
+    // top header tracker
+    let hatchPanelsCollected = 0;
+    text = this.add.text(440, 20, `Hatch Panels`, {
         fontSize: '20px',
         fill: '#ffffff'
-      });
-    text.setScrollFactor(0); 
+    });
+    text.setScrollFactor(0);
     hatchIcon = this.physics.add.staticGroup();
     hatchIcon.create(600, 24, 'hatchIcon');
 
-    let score = space.tilePositionY;
-    score = this.add.text(25, 20, `${score}`, {
+
+    scoreText = this.add.text(25, 20, `Score:0`, {
         fontSize: '20px',
         fill: '#ffffff'
     });
-      text.setScrollFactor(0); 
-    
-// alien
-    alien = this.physics.add.sprite({
-        key: 'alien',
-        repeat: Phaser.Math.Between(1,10),
-        setXY: { x: Phaser.Math.Between(1,10), y: 0, stepY:10000}
-    });
-// black hole portal (maybe not)
+    score += 10;
+    scoreText.setText('Score: ' + score);
+    text.setScrollFactor(0);
 }
 
+
+// // alien
+//     alien = this.physics.add.gif({
+//         key: 'alien',
+//         repeat: Phaser.Math.Between(1,10),
+//         setXY: { x: Phaser.Math.Between(1,10), y: 0, stepY:10000}
+//     });
+// black hole portal (maybe not)
+
 function update() {
+    console.log(controls.getMotion())
     rocket.move(controls.getMotion());
     rocket.fire(controls.getShooting());
 
-    space.tilePositionY -= 2;
+    collectAsset.assetCreate();
+
+    space.tilePositionY -= 5;
     primus.tilePositionY -= 2;
 
     // if (rocket == blackhole && boost = True) {
@@ -89,9 +94,19 @@ function update() {
         primus.destroy();
     }
 }
-let gameOptions = {
-    cargoPercent: 10,
-    alienPercent: 5,
-    hatchPanelsPercent: 20,
-    asteroidPercent: 100
+
+function resize() {
+    let canvas = document.querySelector("canvas");
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+    let windowRatio = windowWidth / windowHeight;
+    let gameRatio = game.config.width / game.config.height;
+    if (windowRatio < gameRatio) {
+        canvas.style.width = windowWidth + "px";
+        canvas.style.height = (windowWidth / gameRatio) + "px";
+    }
+    else {
+        canvas.style.width = (windowHeight * gameRatio) + "px";
+        canvas.style.height = windowHeight + "px";
+    }
 }
