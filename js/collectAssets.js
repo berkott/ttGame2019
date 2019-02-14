@@ -1,6 +1,7 @@
 class collectAssets {
     constructor(scene) {
         this.scene = scene;
+        this.scene.load.image('cargo', '../imgs/cargo.jpg');
     }
 
     assetCreate() {
@@ -41,45 +42,26 @@ class collectAssets {
         // console.log("Phaser math number: " + Phaser.Math.Between(1, 100));
         //adding asteroid from asteroidPool
         if (Phaser.Math.Between(1, 100) <= gameOptions.cargoPercent) {
-            // console.log(2);
-            if (this.scene.cargoPool.getLength()) {
-                let cargo = this.cargoPool.getFirst();
-                cargo.x = Phaser.Math.Between(1, 640);
-                cargo.y = posY - 96;
-                cargo.alpha = 1;
-                cargo.active = true;
-                cargo.visible = true;
-                this.cargoPool.remove(cargo);
-            //     console.log(1);
-            }
-            else {
-                let cargo = this.scene.physics.add.sprite(cargo.x, cargo.y, 'cargo');
-                cargo.setVelocityX(space.body.velocity.x);
-                cargo.anims.play("rotate");
-                cargo.setDepth(2);
-                this.cargoGroup.add(cargo);
-                console.log(3);
-            }
+            let cargo = this.scene.physics.add.sprite(Phaser.Math.Between(1,640), 0, 'cargo');
+            cargo.setVelocityY(10);
+            cargo.setDepth(1);
+            this.cargoGroup.add(cargo);
         }
 
-        // if (Phaser.Math.Between(1, 100) <= gameOptions.hatchPanelsPercent) {
-        //     // if (this.hatchPanelsPool.getLength()) {
-        //         let hatchPanels = this.hatchPanelsPool.getFirst();
-        //         hatchPanels.x = Phaser.Math.Between(1, 640);
-        //         hatchPanels.y = posY - 96;
-        //         hatchPanels.alpha = 1;
-        //         hatchPanels.active = true;
-        //         hatchPanels.visible = true;
-        //         this.hatchPanelsPool.remove(hatchPanels);
-        //     // }
-        //     // else {
-        //         let hatchPanels = this.scene.physics.add.sprite(hatchPanels.x, hatchPanels.y, 'hatchPanels');
-        //         hatchPanels.setVelocityX(space.body.velocity.x);
-        //         hatchPanels.anims.play("rotate");
-        //         hatchPanels.setDepth(2);
-        //         this.hatchPanelsGroup.add(hatchPanels);
-        //     // }
-        // }
+        if (Phaser.Math.Between(1, 100) <= gameOptions.hatchPanelsPercent) {
+            let hatchPanels = this.scene.physics.add.sprite(Phaser.Math.Between (1,640), 0, 'hatchPanels');
+            hatchPanels.setVelocityY(10);
+            hatchPanels.anims.play("rotate");
+            hatchPanels.setDepth(1);
+            this.hatchPanelsGroup.add(hatchPanels);
+        }
+
+        if (Phaser.Math.Between(1, 100) <= gameOptions.asteroidPercent) {
+            let asteroid = this.scene.physics.add.sprite(Phaser.Math.Between (1,640), 0, 'asteroid');
+            asteroid.setVelocityY(10);
+            asteroid.setDepth(2);
+            this.asteroidGroup.add(asteroid);
+        }
 
 
         this.cargoGroup.getChildren().forEach(function (cargo) {

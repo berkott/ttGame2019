@@ -6,8 +6,8 @@ let gameOptions = {
     rocketStartPosition: 320,
     cargoPercent: 10,
     alienPercent: 5,
-    hatchPanelsPercent: 100,
-    asteroidPercent: 100
+    hatchPanelsPercent: 1,
+    asteroidPercent: 1
 }
 
 function preload() {
@@ -44,6 +44,7 @@ function create() {
         yoyo: true,
         repeat: -1
     });
+
     collectAsset = new collectAssets(this);
     //boost
     // if spacebar = full 
