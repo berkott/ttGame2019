@@ -1,7 +1,7 @@
 class Rocket{
     constructor(scene) {
         this.scene = scene;
-        this.rocket = this.scene.add.sprite(gameOptions.rocketStartPosition, game.config.height * 0.9, 'spaceShip');   
+        this.rocket = this.scene.add.sprite(gameOptions.rocketStartPosition, game.config.height * 0.9, 'rocket');   
         //spritesheeet
         // this.player.scaleX = 40;
         // this.player.scaleY = 40;

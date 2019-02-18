@@ -4,7 +4,7 @@ let gameOptions = {
     asteroidSpeedRange: [200, 200],
     spaceSpeed: 80,
     rocketStartPosition: 320,
-    cargoPercent: 10,
+    cargoPercent: 1,
     alienPercent: 5,
     hatchPanelsPercent: 1,
     asteroidPercent: 1
@@ -12,10 +12,10 @@ let gameOptions = {
 
 function preload() {
     this.load.image('space', './imgs/spacegif.jpg');
-    this.load.image('spaceShip', './imgs/rocket.png');
+    this.load.image('rocket', './imgs/rocket.png');
     this.load.image('alien', './imgs/alien.gif');
-    this.load.image('bombs', './imgs/asteroid.jpg');
-    this.load.image('cargo', './imgs/cargo.jpg');
+    this.load.image('asteroid', './imgs/asteroid.png');
+    this.load.image('cargo', './imgs/cargo.png');
     this.load.image('hatchPanels', './imgs/hatchPanel.png');
     this.load.image('bullets', './imgs/laserBlasts.jpg');
     this.load.image('primus', './imgs/primus.png');
@@ -30,7 +30,7 @@ let collectAsset;
 
 function create() {
     space = this.add.tileSprite(320, 480, 640, 960, 'space');
-    primus = this.add.tileSprite(200, 960, 640, 300, 'primus');
+    primus = this.add.tileSprite(320, 960, 640, 150, 'primus');
     rocket = new Rocket(this);
     controls = new Controls(this);
 
@@ -50,15 +50,15 @@ function create() {
     // if spacebar = full 
 
     // top header tracker
+    pause = new Pause(this);
+    hatchIcon = this.physics.add.staticGroup();
+    hatchIcon.create(548, 29, 'hatchIcon');
     let hatchPanelsCollected = 0;
-    text = this.add.text(440, 20, `Hatch Panels`, {
+    text = this.add.text(560, 20, hatchPanelsCollected, {
         fontSize: '20px',
         fill: '#ffffff'
     });
     text.setScrollFactor(0);
-    hatchIcon = this.physics.add.staticGroup();
-    hatchIcon.create(600, 24, 'hatchIcon');
-
 
     let score = 0;
     scoreText = this.add.text(25, 20, `Score:0`, {

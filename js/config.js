@@ -5,16 +5,16 @@ let config = {
     height: 960,
     scene: {
         // loading: loading,
-        // loadScreen: loadScreen,
+        // loadScreen: loadScreen
         preload: preload,
         create: create,
         update: update
     },
     physics: {
         default: "arcade",
-        arcade: {
-            gravity: { y: 100 }
-        }
+        // arcade: {
+        //     gravity: { y: 70 }
+        // }
     }
 }
 
