@@ -80,9 +80,10 @@ function create() {
 // black hole portal (maybe not)
 
 function update() {
+
     // console.log(controls.getMotion())
     rocket.move(controls.getMotion());
-    rocket.fire(controls.getShooting());
+    // rocket.fire(controls.getShooting());
 
     collectAsset.assetCreate();
 

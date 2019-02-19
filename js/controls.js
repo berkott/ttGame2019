@@ -2,13 +2,14 @@ class Controls {
     constructor(scene) {
         this.scene = scene;
 
-        this.up = false;
+        this.left = false;
         this.right = false;
-        this.space = false;
 
-
-        this.keyboard();
         // window.addEventListener('deviceorientation');
+        this.leftArrow = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        this.rightArrow = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        // this.leftArrow = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+
     }
 
     handleOrientation(event) {
@@ -20,22 +21,23 @@ class Controls {
         rocket.style.left = (maxY * y / 180 - 40) + "px";
     }
 
-    keyboard() {
-        this.scene.input.keyboard.on('keydown_ArrowLeft', (e) => { this.left = true });
-        this.scene.input.keyboard.on('keyup_ArrowLeft', (e) => { this.left = false });
+    update(){
+        if (this.leftArrow.isDown) {
+            this.left = true;
+            this.right = false;
+            console.log('teu')
+        } else if (this.rightArrow.isDown) {
+            this.right = true;
+            this.left = false;
+        } else{
+            this.left = false;
+            this.right = false;
+        }
 
-        this.scene.input.keyboard.on('keydown_ArrowRight', _ => { this.right = true });
-        this.scene.input.keyboard.on('keyup_ArrowRight', _ => { this.right = false });
-
-        this.scene.input.keyboard.on('keydown_Space', _ => { this.space = true });
-        this.scene.input.keyboard.on('keyup_Space', _ => { this.space = false });
     }
 
     getMotion() {
+        this.update();
         return { left: this.left, right: this.right };
-    }
-
-    getShooting() {
-        return this.space;
     }
 }
