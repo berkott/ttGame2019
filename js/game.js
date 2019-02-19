@@ -8,8 +8,12 @@ let gameOptions = {
     alienPercent: 5,
     hatchPanelsPercent: 1,
     asteroidPercent: 1
-}
+};
 
+function scaler() {
+    game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    game.scale.setMinMax(400, 300, 800, 600);
+}
 function preload() {
     this.load.image('space', './imgs/spacegif.jpg');
     this.load.image('rocket', './imgs/rocket.png');
@@ -22,11 +26,14 @@ function preload() {
     this.load.image('hatchIcon', './imgs/hatchIcon.png');
 }
 
+
 let space;
 let primus;
 let rocket;
 let controls;
 let collectAsset;
+
+let scoreText;
 
 function create() {
     space = this.add.tileSprite(320, 480, 640, 960, 'space');
@@ -60,16 +67,17 @@ function create() {
     });
     text.setScrollFactor(0);
 
-    let score = 0;
-    scoreText = this.add.text(25, 20, `Score:0`, {
+    scoreText = this.add.text(25, 20, 'Score: 0', {
         fontSize: '20px',
         fill: '#ffffff'
     });
-    score += 10;
-    scoreText.setText('Score: ' + score);
-    text.setScrollFactor(0);
-}
 
+
+
+}
+let score = 0;
+let updateRate = 10;
+let currentUpdate = 0;
 
 // // alien
 //     alien = this.physics.add.gif({
@@ -80,8 +88,8 @@ function create() {
 // black hole portal (maybe not)
 
 function update() {
-
-    // console.log(controls.getMotion())
+    currentUpdate += 1;
+    // console.log(controls.getMotio n())
     rocket.move(controls.getMotion());
     // rocket.fire(controls.getShooting());
 
@@ -90,6 +98,19 @@ function update() {
     space.tilePositionY -= 5;
     primus.tilePositionY -= 2;
 
+    text.setScrollFactor(0);
+    if(currentUpdate === updateRate) {
+        scoreText.destroy();
+        scoreText = this.add.text(25, 20, 'Score: ' + score, {
+            fontSize: '20px',
+            fill: '#ffffff'
+        });
+        // scoreText.setText('Score: ' + score);
+
+
+        score++;
+        currentUpdate = 0;
+    }
     // if (rocket == blackhole && boost = True) {
     //     this.load.image('space', "")
     // }
@@ -99,7 +120,6 @@ function update() {
 }
 
 function resize() {
-    let canvas = document.querySelector("canvas");
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
     let windowRatio = windowWidth / windowHeight;
@@ -113,3 +133,4 @@ function resize() {
         canvas.style.height = windowHeight + "px";
     }
 }
+

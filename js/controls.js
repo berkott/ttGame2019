@@ -25,7 +25,6 @@ class Controls {
         if (this.leftArrow.isDown) {
             this.left = true;
             this.right = false;
-            console.log('teu')
         } else if (this.rightArrow.isDown) {
             this.right = true;
             this.left = false;
@@ -35,6 +34,23 @@ class Controls {
         }
 
     }
+
+
+
+    // update(){
+    //     if (this.leftArrow.isDown) {
+    //         this.left = true;
+    //         this.right = false;
+    //         console.log('teu')
+    //     } else if (this.rightArrow.isDown) {
+    //         this.right = true;
+    //         this.left = false;
+    //     } else{
+    //         this.left = false;
+    //         this.right = false;
+    //     }
+    //
+    // }
 
     getMotion() {
         this.update();
