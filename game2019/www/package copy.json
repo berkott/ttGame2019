@@ -1,0 +1,24 @@
+{
+  "name": "ttgame2019",
+  "version": "1.0.0",
+  "description": "Game for robotics",
+  "main": "alien.js",
+  "dependencies": {
+    "cordova": "^8.1.2",
+    "cordova-plugin-device-gyroscope": "^0.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berkott/ttGame2019.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/berkott/ttGame2019/issues"
+  },
+  "homepage": "https://github.com/berkott/ttGame2019#readme"
+}
